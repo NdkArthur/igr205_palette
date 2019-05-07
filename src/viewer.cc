@@ -1,13 +1,13 @@
 #include <iostream>
-#include <QGuiApplication>
+#include <QApplication>
 #include <QSurfaceFormat>
 #include <QOpenGLContext>
 
-#include "window/glwindow.hh"
+#include "window/mainwindow.hh"
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QSurfaceFormat fmt;
     fmt.setDepthBufferSize(24);
@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
 
     QSurfaceFormat::setDefaultFormat(fmt);
 
-    GLWindow glWindow;
-    glWindow.showNormal();
+    MainWindow window;
+    window.show();
 
     return app.exec();
 }

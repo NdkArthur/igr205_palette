@@ -2,6 +2,12 @@
 ## Building
 
 This project requires Qt5 sdk.
+For windows, once QT5 sdk have been installed you need to add it to your path.
+"Edit the system environment variables" -> "Environment Variables..." -> Select Path -> Edit -> New 
+Then write the path to the bin directory of your Qt5 install : 
+For example : 
+"C:\Qt\5.12.3\msvc2017_64\bin"
+
 Other dependencies are managed using git submodule.
 To initialize the submodules and fetch the appropriate commit use :
 
@@ -15,8 +21,6 @@ Or directly clone the repository with the submodule using :
 ```
     git clone --recurse-submodules git@gitlab.com:tlambert/playful-palette.git
 ```
-
-
 
 Then to build the application
 ```

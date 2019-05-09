@@ -1,6 +1,10 @@
 # Playful Palette
 ## Building
 
+The assets are store using git lfs.
+https://git-lfs.github.com/
+
+
 This project requires Qt5 sdk.
 For windows, once QT5 sdk have been installed you need to add it to your path.
 "Edit the system environment variables" -> "Environment Variables..." -> Select Path -> Edit -> New 

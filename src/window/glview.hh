@@ -28,7 +28,10 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
 
 private slots:
+  // Reloadeds shaders if they have been modified since the last compilation
   void checkShaders();
+
+  // Toggle pbr/color map rendering
   void toggleColorMap(bool);
 
 private:

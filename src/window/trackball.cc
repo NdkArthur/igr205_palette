@@ -10,11 +10,6 @@ void TrackBall::lookAt(const QVector3D &eye, const QVector3D &target, const QVec
     target_ = target;
 }
 
-void TrackBall::setTarget(const QVector3D &target)
-{
-    target_ = target;
-}
-
 void TrackBall::start()
 {
     is_active_ = true;
@@ -48,7 +43,7 @@ bool TrackBall::track(const QPointF &point2D)
     return new_point_valid;
 }
 
-bool TrackBall::zoom(float val, float scale)
+void TrackBall::zoom(float val, float scale)
 {
     auto inv_view = view_.inverted();
     auto translation = inv_view.column(3);
@@ -59,7 +54,6 @@ bool TrackBall::zoom(float val, float scale)
     auto new_pos = target_ + dir * new_dist;
     inv_view.setColumn(3, QVector4D(new_pos, translation.w()));
     view_ = inv_view.inverted();
-    return true;
 }
 
 bool TrackBall::mapToSphere(const QPointF &p2, QVector3D &v3)
@@ -93,7 +87,7 @@ void TrackBall::rotateAroundTarget(float angle, const QVector3D &axis)
     view_ = t_mat1 * q_mat * t_mat2 * view_;
 }
 
-QVector3D TrackBall::position()
+QVector3D TrackBall::position() const
 {
     return view_.inverted().column(3).toVector3D();
 }

@@ -7,14 +7,31 @@
 class TrackBall
 {
 public:
+    // Looks at target from eye position with given up vector
     void lookAt(const QVector3D &eye, const QVector3D &target, const QVector3D &up);
-    void setTarget(const QVector3D &target);
+
+    // Rotate around target according to newPoint2D in camera space
+    // This function have no effect if the trackball is disable
     bool track(const QPointF &newPoint2D);
-    bool zoom(float val, float scale = 0.9);
+
+    // Zooms in direction of target settup by lookAt
+    void zoom(float val, float scale = 0.9);
+
+    // Enables the trackball
     void start();
+
+    // Disables the trackball
+    // When the trackball is disable, the track function
     void stop();
-    QMatrix4x4 viewMatrix() { return view_; }
-    QVector3D position();
+
+    // Returns if the trackball is enable
+    bool isActivate() const { return is_active_; }
+
+    // Returns the view matrix
+    const QMatrix4x4 &viewMatrix() const { return view_; }
+
+    // Extracts camera position from the view matrix
+    QVector3D position() const;
 
 private:
     bool mapToSphere(const QPointF &p2, QVector3D &v3);

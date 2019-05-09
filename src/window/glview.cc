@@ -70,9 +70,11 @@ void GLView::paintGL()
 void GLView::resizeGL(int w, int h)
 {
 
-    auto aabb = model->sceneAlignedBox(0);
     // Calculate aspect ratio
     float aspect = float(w) / float(h ? h : 1);
+
+    // Choose near and far according to scene scale
+    auto aabb = model->sceneAlignedBox(0);
     const float zNear = aabb.scale() * 0.1;
     const float zFar = zNear * 200.0;
 
@@ -143,6 +145,6 @@ void GLView::mouseReleaseEvent(QMouseEvent *event)
 
 void GLView::wheelEvent(QWheelEvent *event)
 {
-    if (trackball_.zoom(-event->angleDelta().y()))
-        update();
+    trackball_.zoom(-event->angleDelta().y());
+    update();
 }

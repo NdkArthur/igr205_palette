@@ -11,15 +11,23 @@
 
 class QOpenGLShaderProgram;
 
+// Represents a gltf 2.0 model
+// The gltf specification can be found:
+// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md
 class Model
 {
 public:
   static std::unique_ptr<Model> load(const char *filename);
 
+  // Draw scene s using program prog
   void drawScene(int s, QOpenGLShaderProgram &prog);
+
+  // Get bounding box of scene s
   AlignedBox sceneAlignedBox(int s);
 
 private:
+  // A Material represent the appearance of an object
+  // It is composed of a set of texture and factore representing the different properties of the material
   struct Material
   {
     QVector4D base_color_factor = QVector4D(1, 1, 1, 1);
@@ -36,23 +44,25 @@ private:
     std::unique_ptr<QOpenGLTexture> emissive_map;
   };
 
+  // A Primitive represents a single geometric entity
   struct Primitive
   {
-    int vao_id;
-    int material_id;
-    GLenum mode;
-    size_t count;
-    GLenum component_type;
-    size_t offset;
-    AlignedBox aabb;
+    int vao_id;            // Index of the Vertex Array buffer
+    int material_id;       // Index of the material
+    GLenum mode;           // Type of component (triangle,triangle fan, quad,...)
+    size_t count;          // Number of component
+    GLenum component_type; // Type of index (unsigned int, short int, ...)
+    size_t offset;         // Offset of the first index in the index buffer
+    AlignedBox aabb;       // Axis Aligned bounding box
   };
 
+  // A Node in the scene graph
   struct Node
   {
-    QMatrix4x4 transform;
-    std::vector<int> children;
-    int first_primitive = -1;
-    int primitive_number = 0;
+    QMatrix4x4 transform;      // Transformation matrix of this node
+    std::vector<int> children; // List of children of the node
+    int first_primitive = -1;  // Index of the first primitive for this node or -1 if no primitive
+    int primitive_number = 0;  // Total number of primitives
   };
 
   struct Scene

@@ -1,6 +1,5 @@
 #include "trackball.hh"
 
-#include <cmath>
 #include <QQuaternion>
 #include <QTransform>
 

@@ -11,9 +11,7 @@ set(CMAKE_AUTOMOC ON)
 # Create code from a list of Qt designer ui files
 set(CMAKE_AUTOUIC ON)
 # Find the Qt library
-find_package(Qt5Core CONFIG REQUIRED)
-find_package(Qt5Widgets CONFIG REQUIRED)
-find_package(Qt5OpenGL CONFIG REQUIRED)
+find_package(Qt5 COMPONENTS REQUIRED Core Gui Widgets OpenGL)
 
 # tinygltf
 include_directories(lib/tinygltf)
@@ -26,4 +24,4 @@ message("${SRCS}")
 
 add_executable(viewer src/viewer.cc ${SRCS})
 
-target_link_libraries(viewer Qt5::Widgets Qt5::Core Qt5::OpenGL)
+target_link_libraries(viewer Qt5::Widgets Qt5::Core Qt5::OpenGL Qt5::Gui)

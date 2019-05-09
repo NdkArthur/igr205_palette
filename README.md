@@ -1,7 +1,8 @@
 # Playful Palette
 ## Building
 
-Most of the dependencies are managed using git submodule.
+This project requires Qt5 sdk.
+Other dependencies are managed using git submodule.
 To initialize the submodules and fetch the appropriate commit use :
 
 ```
@@ -14,6 +15,8 @@ Or directly clone the repository with the submodule using :
 ```
     git clone --recurse-submodules git@gitlab.com:tlambert/playful-palette.git
 ```
+
+
 
 Then to build the application
 ```

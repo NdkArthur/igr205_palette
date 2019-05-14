@@ -110,7 +110,8 @@ std::unique_ptr<Model> Model::load(const char *filename)
         auto it = m.values.find("baseColorTexture");
         if (it != m.values.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             auto &t = gltf_model.textures[val.TextureIndex()];
             auto &img = gltf_model.images[t.source];
             mat.color_map = std::unique_ptr<QOpenGLTexture>(new QOpenGLTexture(QOpenGLTexture::Target2D));
@@ -130,7 +131,8 @@ std::unique_ptr<Model> Model::load(const char *filename)
         it = m.values.find("metallicRoughnessTexture");
         if (it != m.values.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             auto &t = gltf_model.textures[val.TextureIndex()];
             auto &img = gltf_model.images[t.source];
             mat.metallic_roughness_map = std::unique_ptr<QOpenGLTexture>(new QOpenGLTexture(QOpenGLTexture::Target2D));
@@ -151,7 +153,8 @@ std::unique_ptr<Model> Model::load(const char *filename)
         it = m.values.find("baseColorFactor");
         if (it != m.values.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             auto factor = val.ColorFactor();
             mat.base_color_factor = QVector4D(factor[0], factor[1], factor[2], factor[3]);
         }
@@ -159,21 +162,24 @@ std::unique_ptr<Model> Model::load(const char *filename)
         it = m.values.find("metallicFactor");
         if (it != m.values.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             mat.metallic_roughness_values.setX((float)val.Factor());
         }
 
         it = m.values.find("roughnessFactor");
         if (it != m.values.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             mat.metallic_roughness_values.setY((float)val.Factor());
         }
 
         it = m.additionalValues.find("normalTexture");
         if (it != m.additionalValues.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             auto &t = gltf_model.textures[val.TextureIndex()];
             auto &img = gltf_model.images[t.source];
             mat.normal_map = std::unique_ptr<QOpenGLTexture>(new QOpenGLTexture(QOpenGLTexture::Target2D));
@@ -200,7 +206,8 @@ std::unique_ptr<Model> Model::load(const char *filename)
         it = m.additionalValues.find("emissiveTexture");
         if (it != m.additionalValues.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             auto &t = gltf_model.textures[val.TextureIndex()];
             auto &img = gltf_model.images[t.source];
             mat.emissive_map = std::unique_ptr<QOpenGLTexture>(new QOpenGLTexture(QOpenGLTexture::Target2D));
@@ -221,7 +228,8 @@ std::unique_ptr<Model> Model::load(const char *filename)
         it = m.additionalValues.find("emissiveFactor");
         if (it != m.additionalValues.end())
         {
-            auto &[name, val] = *it;
+            const auto &name = it->first;
+            const auto &val = it->second;
             auto factor = val.ColorFactor();
             mat.base_color_factor = QVector3D(factor[0], factor[1], factor[2]);
         }
@@ -241,8 +249,10 @@ std::unique_ptr<Model> Model::load(const char *filename)
             vao.create();
             vao.bind();
 
-            for (const auto &[name, a] : p.attributes)
+            for (const auto &it : p.attributes)
             {
+                const auto &name = it.first;
+                const auto &a = it.second;
                 if (attribute_mapping.count(name.c_str()))
                 {
                     const auto &acc = gltf_model.accessors[a];
@@ -396,9 +406,12 @@ void Model::drawPrimitive(const Primitive &primitive, QOpenGLShaderProgram &prog
     prog.setUniformValue("mat_normal", transform.normalMatrix());
 
     // Active attributes
-    for (const auto &[key, val] : attribute_mapping)
+    for (const auto &it : attribute_mapping)
     {
-        const auto &[index, name] = val;
+        const auto &key = it.first;
+        const auto &val = it.second;
+        const auto &index = val.first;
+        const auto &name = val.second;
         auto loc = prog.attributeLocation(name);
         if (loc != -1)
         {

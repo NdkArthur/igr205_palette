@@ -4,7 +4,6 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QDateTime>
-#include <optional>
 #include "model.hh"
 #include "trackball.hh"
 

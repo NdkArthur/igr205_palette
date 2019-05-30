@@ -74,6 +74,7 @@ private:
   void drawPrimitive(const Primitive &primitive, QOpenGLShaderProgram &prog, const QMatrix4x4 &transform);
   AlignedBox nodeAlignedBox(const Node &node, const QMatrix4x4 &transform);
 
+  QString modelPathName;
   std::vector<Scene> scenes_;
   std::vector<Node> nodes_;
   std::vector<std::unique_ptr<QOpenGLBuffer>> buffers_;

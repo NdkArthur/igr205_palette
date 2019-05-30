@@ -18,7 +18,7 @@ include_directories(lib/tinygltf)
 
 add_definitions(-DPROJECT_DIR="${PROJECT_SOURCE_DIR}")
 
-file(GLOB_RECURSE SRCS src/window/*.cc)
+file(GLOB_RECURSE SRCS src/window/*.cc src/paletteWidget/*.cpp)
 
 message("${SRCS}")
 

@@ -8,6 +8,7 @@ class Tessel
 {
 public:
     Tessel(Dish * _dish, QPoint _point);
+    Tessel(){}
     QColor getColor();
 
 private :

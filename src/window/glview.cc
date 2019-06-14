@@ -6,9 +6,11 @@
 #include <QFileInfo>
 #include <QMouseEvent>
 #include <iostream>
+#include <QOpenGLFramebufferObject>
 
 const char *vert_filename = PROJECT_DIR "/src/shaders/simple.vert";
 const char *frag_filename = PROJECT_DIR "/src/shaders/simple.frag";
+const char *test_filename = PROJECT_DIR "/src/shaders/test.frag";
 
 GLView::GLView(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -48,21 +50,38 @@ void GLView::initializeGL()
 
 void GLView::paintGL()
 {
+    
+    
+    
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (program_.isLinked())
+//    if (program_.isLinked())
+//    {
+//        program_.bind();
+//        program_.setUniformValue("mat_view", trackball_.viewMatrix());
+//        program_.setUniformValue("mat_proj", proj_mat_);
+//        program_.setUniformValue("cam_pos", trackball_.position());
+//        program_.setUniformValueArray("light_directions", light_directions, 3);
+//        program_.setUniformValueArray("light_colors", light_colors, 3);
+//        program_.setUniformValue("only_color_map", only_color_map);
+//        if (model)
+//        {
+//            model->drawScene(0, program_);
+//        }
+//    }
+
+    if (additionalProgram_.isLinked())
     {
-        program_.bind();
-        program_.setUniformValue("mat_view", trackball_.viewMatrix());
-        program_.setUniformValue("mat_proj", proj_mat_);
-        program_.setUniformValue("cam_pos", trackball_.position());
-        program_.setUniformValueArray("light_directions", light_directions, 3);
-        program_.setUniformValueArray("light_colors", light_colors, 3);
-        program_.setUniformValue("only_color_map", only_color_map);
+        additionalProgram_.bind();
+        additionalProgram_.setUniformValue("mat_view", trackball_.viewMatrix());
+        additionalProgram_.setUniformValue("mat_proj", proj_mat_);
+        additionalProgram_.setUniformValue("cam_pos", trackball_.position());
+        additionalProgram_.setUniformValueArray("light_directions", light_directions, 3);
+        additionalProgram_.setUniformValueArray("light_colors", light_colors, 3);
+        additionalProgram_.setUniformValue("only_color_map", only_color_map);
         if (model)
         {
-            model->drawScene(0, program_);
+            model->drawScene(0, additionalProgram_);
         }
     }
 }
@@ -111,12 +130,19 @@ bool GLView::loadProgram()
     program_.removeAllShaders();
     program_.addShaderFromSourceFile(QOpenGLShader::Vertex, vert_filename);
     program_.addShaderFromSourceFile(QOpenGLShader::Fragment, frag_filename);
-    bool link_res = program_.link();
+
+    additionalProgram_.removeAllShaders();
+    additionalProgram_.addShaderFromSourceFile(QOpenGLShader::Vertex, vert_filename);
+    additionalProgram_.addShaderFromSourceFile(QOpenGLShader::Fragment, test_filename);
+
+    bool link_res = program_.link() && additionalProgram_.link();
+
     if (link_res)
         last_link_ = QDateTime::currentDateTime();
 
     return link_res;
 }
+
 
 void GLView::mouseMoveEvent(QMouseEvent *event)
 {
@@ -132,6 +158,32 @@ void GLView::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::RightButton)
     {
         trackball_.start();
+    }
+
+    if (event->button() == Qt::LeftButton)
+    {
+        std::cout << "# Event detected" <<std::endl;
+        QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(QSize(int(width_), int(height_)), GL_TEXTURE_2D);
+        if (fbo->bind()) {
+            std::cout << "Fbo binded" <<std::endl;
+            update();
+            std::cout << "Fbo rendered" <<std::endl;
+            QImage textCoord = fbo->toImage();
+            fbo->release();
+
+
+            textCoord.save("frameBuffetTest.png");
+            std::cout << "Fbo to qimage done" <<std::endl;
+            QColor t = textCoord.pixelColor(event->pos());
+            std::cout << "Frame buffer dim w: " << width_<< " | h: " << height_<<std::endl;
+            std::cout << "Clicked pos X: " << event->pos().x()<< " | Y: " <<event->pos().y() <<std::endl;
+            std::cout << "Tex coord X: " << t.red()<< " | Y: " <<t.green() << "| test:" << t.blue()<<std::endl;
+            std::cout << "###" <<std::endl;
+
+        }
+        delete fbo;
+
+
     }
 }
 

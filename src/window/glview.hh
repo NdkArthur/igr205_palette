@@ -37,6 +37,7 @@ private:
   bool loadProgram();
 
   QOpenGLShaderProgram program_;
+  QOpenGLShaderProgram additionalProgram_;
   QDateTime last_link_;
 
   TrackBall trackball_;

@@ -12,6 +12,9 @@
 #include <QOpenGLFunctions_4_5_Core>
 #include <map>
 #include <iostream>
+#include <QtOpenGL>
+
+#define TEST_ARTHUR
 
 struct cmp_str
 {
@@ -100,6 +103,10 @@ std::unique_ptr<Model> Model::load(const char *filename)
         buf.bind();
         buf.allocate(vec.data() + bv.byteOffset, bv.byteLength * sizeof(vec[0]));
     }
+
+#ifdef TEST_ARTHUR
+
+#endif
 
     //Load Materials
     model->materials_.reserve(gltf_model.materials.size());

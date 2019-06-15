@@ -166,7 +166,17 @@ void GLView::mousePressEvent(QMouseEvent *event)
         QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(QSize(int(width_), int(height_)), GL_TEXTURE_2D);
         if (fbo->bind()) {
             std::cout << "Fbo binded" <<std::endl;
-            update();
+            //update();
+            QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+            f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            if (additionalProgram_.isLinked())
+            {
+                additionalProgram_.bind();
+                if (model)
+                {
+                   // model->drawScene(0, additionalProgram_);
+                }
+            }
             std::cout << "Fbo rendered" <<std::endl;
             QImage textCoord = fbo->toImage();
             fbo->release();

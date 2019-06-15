@@ -114,6 +114,7 @@ std::unique_ptr<Model> Model::load(const char *filename)
             const auto &val = it->second;
             auto &t = gltf_model.textures[val.TextureIndex()];
             auto &img = gltf_model.images[t.source];
+
             mat.color_map = std::unique_ptr<QOpenGLTexture>(new QOpenGLTexture(QOpenGLTexture::Target2D));
             mat.color_map->setSize(img.width, img.height);
             mat.color_map->setFormat(QOpenGLTexture::SRGB8_Alpha8);
@@ -340,11 +341,18 @@ std::unique_ptr<Model> Model::load(const char *filename)
     return model;
 }
 
+
+
 void Model::drawScene(int s, QOpenGLShaderProgram &prog)
 {
     if (scenes_.size() > s)
         for (const auto &n : scenes_[s].nodes)
             drawNode(nodes_[n], prog, QMatrix4x4());
+}
+
+void Model::drawTexture(int s, QOpenGLShaderProgram &prog)
+{
+
 }
 
 void Model::drawNode(const Node &node, QOpenGLShaderProgram &prog, const QMatrix4x4 &transform)

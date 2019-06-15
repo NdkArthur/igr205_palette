@@ -16,9 +16,17 @@ find_package(Qt5 COMPONENTS REQUIRED Core Gui Widgets OpenGL)
 # tinygltf
 include_directories(lib/tinygltf)
 
+# Qt library
+find_package(Qt5Widgets)
+find_package(Qt5OpenGL)
+set(CMAKE_AUTOMOC ON)
+
+find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
+find_package(OpenGL REQUIRED)
+
 add_definitions(-DPROJECT_DIR="${PROJECT_SOURCE_DIR}")
 
-file(GLOB_RECURSE SRCS src/window/*.cc src/paletteWidget/*.cpp)
+file(GLOB_RECURSE SRCS src/window/*.cc src/window/*.cpp src/paletteWidget/*.cpp)
 
 message("${SRCS}")
 

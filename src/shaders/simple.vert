@@ -19,3 +19,4 @@ void main() {
   out_texcoord = vtx_texcoord;
   out_normal = normalize(mat_normal * vtx_normal);
 }
+

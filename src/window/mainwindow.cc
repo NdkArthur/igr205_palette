@@ -4,20 +4,39 @@
 #include <QWidget>
 #include <QBoxLayout>
 #include "../paletteWidget/palettewidget.h"
+#include <QPixmap>
 
 MainWindow::MainWindow()
 {
+    QWidget * cw = new QWidget(this);
 
-    QWidget *cw = new QWidget(this);
-    QVBoxLayout *mainLayout = new QVBoxLayout(cw);
-    QHBoxLayout *toolLayout = new QHBoxLayout();
+    QVBoxLayout * mainLayout = new QVBoxLayout(cw);
+    QHBoxLayout * visuLayout = new QHBoxLayout();
+    QHBoxLayout * toolLayout = new QHBoxLayout();
     palette = new PaletteWidget(this);
     toolLayout->addWidget(palette);
     toolLayout->addStretch(5);
 
+
+
+//    connect(xSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setXRotation(int)));
+//    connect(glWidget, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
+//    connect(ySlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setYRotation(int)));
+//    connect(glWidget, SIGNAL(yRotationChanged(int)), ySlider, SLOT(setValue(int)));
+//    connect(zSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setZRotation(int)));
+//    connect(glWidget, SIGNAL(zRotationChanged(int)), zSlider, SLOT(setValue(int)));
+
     gl_view_ = new GLView(this);
-    mainLayout->addWidget(gl_view_);
+    visuLayout->addWidget(gl_view_);
+    mainLayout->addLayout(visuLayout);
     mainLayout->addLayout(toolLayout);
+
+
+    glWidget = new GLWidget(this, gl_view_->getModel());
+
+    visuLayout->addWidget(glWidget);
+    visuLayout->addStretch(5);
+
     setCentralWidget(cw);
 
     QToolBar *tool_bar = new QToolBar("Tools", this);

@@ -384,7 +384,7 @@ void Model::drawPrimitive(const Primitive &primitive, QOpenGLShaderProgram &prog
     prog.setUniformValue("metallic_roughness_values", mat.metallic_roughness_values);
     prog.setUniformValue("occlusion_strength", mat.occlusion_strength);
     bool has_metallic_roughness_map = mat.metallic_roughness_map.operator bool();
-    prog.setUniformValue("has_metallic_roughness_map", has_metallic_roughness_map);addi
+    prog.setUniformValue("has_metallic_roughness_map", has_metallic_roughness_map);
     prog.setUniformValue("has_occlusion_map", mat.has_occlusion_map);
     if (has_metallic_roughness_map)
     {

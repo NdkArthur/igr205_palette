@@ -19,11 +19,21 @@ class Model
 public:
   static std::unique_ptr<Model> load(const char *filename);
 
+
   // Draw scene s using program prog
   void drawScene(int s, QOpenGLShaderProgram &prog);
 
+  void drawTexture(int s, QOpenGLShaderProgram &prog);
+
   // Get bounding box of scene s
   AlignedBox sceneAlignedBox(int s);
+
+ QOpenGLTexture * getColormap(){
+      auto & m = materials_[0];
+      QOpenGLTexture * c = m.color_map.get();
+      return c;}
+
+//  std::vector<Material> getMaterials() {return materials_;}
 
 private:
   // A Material represent the appearance of an object
@@ -43,6 +53,7 @@ private:
     QVector3D emissive_factor = QVector3D(1, 1, 1);
     std::unique_ptr<QOpenGLTexture> emissive_map;
   };
+
 
   // A Primitive represents a single geometric entity
   struct Primitive

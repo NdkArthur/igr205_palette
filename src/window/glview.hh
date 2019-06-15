@@ -20,6 +20,8 @@ public:
   void paintGL();
   void resizeGL(int w, int h);
 
+  Model * getModel(){return model.get();}
+
 protected:
   void mouseMoveEvent(QMouseEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;

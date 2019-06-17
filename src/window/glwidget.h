@@ -58,8 +58,6 @@ private:
 
     void loadTexture(QString textureName);
 
-//    GLView * glview = new GLView();
-
     GLuint m_posAttrib;
     std::unique_ptr<QOpenGLVertexArrayObject>  vao_ptr;
 };

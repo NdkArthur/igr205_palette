@@ -1,7 +1,5 @@
 #version 450 core
 
-
-
 vec2 vertices[4] = { vec2(-1.0f, 1.0f), vec2(-1.0f, -1.0f),vec2(1.0f, 1.0f),vec2(1.0f, -1.0f)};
 
 out vec2 out_texcoord;

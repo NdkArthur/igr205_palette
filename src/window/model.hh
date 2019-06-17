@@ -29,18 +29,7 @@ public:
   AlignedBox sceneAlignedBox(int s);
 
   QOpenGLTexture * getColormap(){
-      std::cout<< "material size :" << materials_.size() << std::endl;
-      std::cout<< "material size :" << materials_.size() << std::endl;
-      std::cout<< "material size :" << materials_.size() << std::endl;
-      std::cout<< "material size :" << materials_.size() << std::endl;
-      std::cout<< "material size :" << materials_.size() << std::endl;
-      std::cout<< "material size :" << materials_.size() << std::endl;
       auto & m = materials_[0];
-
-      if (!m.color_map) {
-          std::cout<< "color map not initialized:"<< std::endl;
-      }
-
       QOpenGLTexture * c = m.color_map.get();
       return c;}
 

@@ -40,11 +40,11 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent){
 }
 
 QSize GLWidget::minimumSizeHint() const{
-    return QSize(500, 150);
+    return QSize(500, 300);
 }
 
 QSize GLWidget::sizeHint() const{
-    return QSize(400, 400);
+    return QSize(500, 500);
 }
 
 
@@ -52,16 +52,10 @@ void GLWidget::initializeGL(){
     makeCurrent();
     QOpenGLFunctions * f = QOpenGLContext::currentContext()->functions();
     f->glClearColor(0.3f, 0.f, 0.f, 1.0f);
-
-    std::cout<<"###\nintialized GL widget : start" <<std::endl;
-
-    std::cout<<"load shaders : start" <<std::endl;
     program_.removeAllShaders();
     program_.addShaderFromSourceFile(QOpenGLShader::Vertex, verts_filename);
     program_.addShaderFromSourceFile(QOpenGLShader::Fragment, frags_filename);
-    std::cout<<"load shaders : end" <<std::endl;
     program_.link();
-    std::cout<<"intialized GL widget : end" <<std::endl;
     vao_ptr = std::make_unique<QOpenGLVertexArrayObject>(new QOpenGLVertexArrayObject() );
     vao_ptr->create();
     doneCurrent();
@@ -69,11 +63,7 @@ void GLWidget::initializeGL(){
 }
 
 void GLWidget::updateTexture(Model* model) {
-
-    std::cout<<"get color map : start" <<std::endl;
     color_map = model->getColormap();
-    std::cout<<"send attributes to GPU : start 2" <<std::endl;
-
 }
 
 void GLWidget::render(){
@@ -85,7 +75,7 @@ void GLWidget::render(){
     program_.bind();
 
     int tex_unit_count = 0;
-    std::cout<<"send attributes to GPU : start 1" <<std::endl;
+
     color_map->bind(tex_unit_count);
     program_.setUniformValue("color_map", tex_unit_count);
     vao_ptr->bind();

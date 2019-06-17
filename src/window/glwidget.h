@@ -18,17 +18,19 @@
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-class GLWidget : public QGLWidget{
+class GLWidget : public QOpenGLWidget{
     Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = 0, Model * m = nullptr);
+    GLWidget(QWidget *parent = 0);
     ~GLWidget(){}
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
     void render();
+public slots:
+    void updateTexture(Model*);
 
 protected:
     void initializeGL();
@@ -56,10 +58,8 @@ private:
 
     void loadTexture(QString textureName);
 
-    Model * model;
-//    GLView * glview = new GLView();
-
     GLuint m_posAttrib;
+    std::unique_ptr<QOpenGLVertexArrayObject>  vao_ptr;
 };
 
 #endif // GLWIDGET_H

@@ -26,7 +26,6 @@
 #include <cstdlib>
 
 #include <algorithm>
-#include <GL/glut.h>
 #include <float.h>
 
 const char *verts_filename = PROJECT_DIR "/src/shaders/textureWidget.vert";
@@ -65,19 +64,20 @@ void GLWidget::initializeGL(){
     program_.removeAllShaders();
     program_.addShaderFromSourceFile(QOpenGLShader::Vertex, verts_filename);
     program_.addShaderFromSourceFile(QOpenGLShader::Fragment, frags_filename);
+    program_.link();
     std::cout<<"load shaders : end" <<std::endl;
 
+    //color_map = model->getColormap();
+    QOpenGLTexture * test = new QOpenGLTexture(QImage(PROJECT_DIR "/assets/WaterBottle/WaterBottle_baseColor.png"));
     std::cout<<"send attributes to GPU : start" <<std::endl;
-    color_map = model->getColormap();
     int tex_unit_count = 0;
 
-    color_map->bind(tex_unit_count);
+    test->bind(tex_unit_count);
     program_.setUniformValue("color_map", tex_unit_count);
 
-
-    m_posAttrib = program_.attributeLocation("vtx_positions");
     std::cout<<"send attributes to GPU : end" <<std::endl;
-    program_.link();
+    m_posAttrib = program_.attributeLocation("vtx_positions");
+
     std::cout<<"intialized GL widget : end" <<std::endl;
 }
 
@@ -103,16 +103,8 @@ void GLWidget::render(){
 }
 
 void GLWidget::resizeGL(int width, int height){
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-    f->glViewport(0, 0, width, height);
 
-//    int side = qMin(width, height);
-//    f->glViewport((width - side) / 2, (height - side) / 2, side, side);
-//    f->glMatrixMode(GL_PROJECTION);
-//    f->glLoadIdentity();
-//    f->glOrtho(-0.5, +0.5, +0.5, -0.5, 4.0, 15.0);
-//    f->glMatrixMode(GL_MODELVIEW);
-//    f->glLoadIdentity();
+
 }
 
 void GLWidget::paintGL(){

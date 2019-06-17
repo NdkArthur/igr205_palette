@@ -48,6 +48,27 @@ void GLView::initializeGL()
     only_color_map = false;
 }
 
+void GLView::render(QOpenGLShaderProgram & prog) {
+    makeCurrent();
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (prog.isLinked())
+    {
+        prog.bind();
+        prog.setUniformValue("mat_view", trackball_.viewMatrix());
+        prog.setUniformValue("mat_proj", proj_mat_);
+        prog.setUniformValue("cam_pos", trackball_.position());
+        prog.setUniformValueArray("light_directions", light_directions, 3);
+        prog.setUniformValueArray("light_colors", light_colors, 3);
+        prog.setUniformValue("only_color_map", only_color_map);
+        if (model)
+        {
+            model->drawScene(0, additionalProgram_);
+        }
+    }
+    doneCurrent();
+};
+
 void GLView::paintGL()
 {
     
@@ -55,35 +76,21 @@ void GLView::paintGL()
     
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    if (program_.isLinked())
-//    {
-//        program_.bind();
-//        program_.setUniformValue("mat_view", trackball_.viewMatrix());
-//        program_.setUniformValue("mat_proj", proj_mat_);
-//        program_.setUniformValue("cam_pos", trackball_.position());
-//        program_.setUniformValueArray("light_directions", light_directions, 3);
-//        program_.setUniformValueArray("light_colors", light_colors, 3);
-//        program_.setUniformValue("only_color_map", only_color_map);
-//        if (model)
-//        {
-//            model->drawScene(0, program_);
-//        }
-//    }
-
-    if (additionalProgram_.isLinked())
+    if (program_.isLinked())
     {
-        additionalProgram_.bind();
-        additionalProgram_.setUniformValue("mat_view", trackball_.viewMatrix());
-        additionalProgram_.setUniformValue("mat_proj", proj_mat_);
-        additionalProgram_.setUniformValue("cam_pos", trackball_.position());
-        additionalProgram_.setUniformValueArray("light_directions", light_directions, 3);
-        additionalProgram_.setUniformValueArray("light_colors", light_colors, 3);
-        additionalProgram_.setUniformValue("only_color_map", only_color_map);
+        program_.bind();
+        program_.setUniformValue("mat_view", trackball_.viewMatrix());
+        program_.setUniformValue("mat_proj", proj_mat_);
+        program_.setUniformValue("cam_pos", trackball_.position());
+        program_.setUniformValueArray("light_directions", light_directions, 3);
+        program_.setUniformValueArray("light_colors", light_colors, 3);
+        program_.setUniformValue("only_color_map", only_color_map);
         if (model)
         {
-            model->drawScene(0, additionalProgram_);
+            model->drawScene(0, program_);
         }
     }
+
 }
 
 void GLView::resizeGL(int w, int h)
@@ -162,21 +169,29 @@ void GLView::mousePressEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
+        makeCurrent();
         std::cout << "# Event detected" <<std::endl;
-        QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(QSize(int(width_), int(height_)), GL_TEXTURE_2D);
+        QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(QSize(int(width_), int(height_)),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
         if (fbo->bind()) {
             std::cout << "Fbo binded" <<std::endl;
-            //update();
+
             QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+            f->glClearColor(0, 0, 0, 0);
             f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             if (additionalProgram_.isLinked())
             {
                 additionalProgram_.bind();
+                additionalProgram_.setUniformValue("mat_view", trackball_.viewMatrix());
+                additionalProgram_.setUniformValue("mat_proj", proj_mat_);
+                additionalProgram_.setUniformValue("cam_pos", trackball_.position());
                 if (model)
                 {
-                   // model->drawScene(0, additionalProgram_);
+                    model->drawScene(0, additionalProgram_);
                 }
             }
+            //paintGL();
+            float pix[4];
+            f->glReadPixels(event->pos().x(),int(height_) - event->pos().y(), 1, 1, GL_RGBA, GL_FLOAT, pix);
             std::cout << "Fbo rendered" <<std::endl;
             QImage textCoord = fbo->toImage();
             fbo->release();
@@ -187,12 +202,13 @@ void GLView::mousePressEvent(QMouseEvent *event)
             QColor t = textCoord.pixelColor(event->pos());
             std::cout << "Frame buffer dim w: " << width_<< " | h: " << height_<<std::endl;
             std::cout << "Clicked pos X: " << event->pos().x()<< " | Y: " <<event->pos().y() <<std::endl;
-            std::cout << "Tex coord X: " << t.red()<< " | Y: " <<t.green() << "| test:" << t.blue()<<std::endl;
+            std::cout << "Tex coord X: " <<pix[0]<< " | Y: " <<pix[1] << "| test:" << pix[3]<<std::endl;
             std::cout << "###" <<std::endl;
+            f->glClearColor(0.2, 0.2, 0.2, 1);
 
         }
         delete fbo;
-
+        doneCurrent();
 
     }
 }

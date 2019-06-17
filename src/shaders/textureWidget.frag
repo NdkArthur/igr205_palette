@@ -1,6 +1,6 @@
 #version 450 core
 
-in vec2 frag_texcoord;
+layout(location = 0) in vec2 frag_texcoord;
 
 out vec4 out_color;
 uniform sampler2D color_map;

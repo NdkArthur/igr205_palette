@@ -2,12 +2,12 @@
 
 in vec3 vtx_position;
 
-out vec2 out_texcoord;
+layout(location = 0) out vec2 out_texcoord;
 
 
 void main() {
 
 
-  out_texcoord = Vec2((vtx_position[0]+1)/2, (vtx_position[1]+1)/2);
+  out_texcoord = vec2((vtx_position[0]+1)/2, (vtx_position[1]+1)/2);
 
 }

@@ -32,9 +32,9 @@ MainWindow::MainWindow()
     mainLayout->addLayout(toolLayout);
 
 
-    glWidget = new GLWidget(this, gl_view_->getModel());
+//    glWidget = new GLWidget(this, gl_view_->getModel());
 
-    visuLayout->addWidget(glWidget);
+//    visuLayout->addWidget(glWidget);
     visuLayout->addStretch(5);
 
     setCentralWidget(cw);

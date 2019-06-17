@@ -10,7 +10,7 @@
 
 const char *vert_filename = PROJECT_DIR "/src/shaders/simple.vert";
 const char *frag_filename = PROJECT_DIR "/src/shaders/simple.frag";
-const char *test_filename = PROJECT_DIR "/src/shaders/test.frag";
+const char *test_filename = PROJECT_DIR "/src/shaders/picking.frag";
 
 GLView::GLView(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -24,6 +24,7 @@ GLView::GLView(QWidget *parent)
 
 GLView::~GLView()
 {
+    makeCurrent();
 }
 
 void GLView::initializeGL()
@@ -77,6 +78,7 @@ void GLView::paintGL()
     
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    f->glClearColor(0.2, 0.2, 0.2, 1);
     if (program_.isLinked())
     {
         program_.bind();
@@ -190,21 +192,18 @@ void GLView::mousePressEvent(QMouseEvent *event)
                     model->drawScene(0, additionalProgram_);
                 }
             }
-            //paintGL();
             float pix[4];
             f->glReadPixels(event->pos().x(),int(height_) - event->pos().y(), 1, 1, GL_RGBA, GL_FLOAT, pix);
             std::cout << "Fbo rendered" <<std::endl;
-            QImage textCoord = fbo->toImage();
+//            QImage textCoord = fbo->toImage();
+//            textCoord.save("frameBuffetTest.png");
             fbo->release();
-
-
-            textCoord.save("frameBuffetTest.png");
             std::cout << "Fbo to qimage done" <<std::endl;
-            QColor t = textCoord.pixelColor(event->pos());
             std::cout << "Frame buffer dim w: " << width_<< " | h: " << height_<<std::endl;
             std::cout << "Clicked pos X: " << event->pos().x()<< " | Y: " <<event->pos().y() <<std::endl;
             std::cout << "Tex coord X: " <<pix[0]<< " | Y: " <<pix[1] << "| test:" << pix[3]<<std::endl;
             std::cout << "###" <<std::endl;
+            emit clicked(QVector2D(pix[0], pix[1]));
             f->glClearColor(0.2, 0.2, 0.2, 1);
 
         }

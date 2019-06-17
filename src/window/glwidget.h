@@ -12,9 +12,9 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QDateTime>
+#include <QPoint>
+
 #include "model.hh"
-#include "trackball.hh"
-#include "glview.hh"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -31,6 +31,11 @@ public:
     void render();
 public slots:
     void updateTexture(Model*);
+    void updateTextCoord(QVector2D tc);
+    void setBrushColor(QColor c) {
+        brushColor = c;
+        update();
+    }
 
 protected:
     void initializeGL();
@@ -40,21 +45,18 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 
 private:
-    int xRot;
-    int yRot;
-    int zRot;
+
     QOpenGLTexture * color_map;
     bool loadProgram();
+    QVector2D currentTextCoord = QVector2D(0,0);
+    QColor brushColor = QColor(125, 125, 125);;
+
 
     QOpenGLShaderProgram program_;
     QDateTime last_link_;
 
-    TrackBall trackball_;
-    QMatrix4x4 proj_mat_;
-    bool only_color_map;
-
-    float width_, height_;
     float fov_ = 45.0;
+    bool moveIsOn = false;
 
     void loadTexture(QString textureName);
 

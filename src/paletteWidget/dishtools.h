@@ -34,7 +34,13 @@ public slots:
     void paintEvent(QPaintEvent*);
     void blobColorChange(Blob* b);
     void setRunningColor(QColor c) {runningColor = c; update();}
-    void setCurrentTessel(Tessel * c) {currentTessel = c; update();}
+    void setCurrentTessel(Tessel * c) {
+        currentTessel = c;
+        emit tesselChanged(c->getColor());
+        update();}
+
+signals:
+   void tesselChanged(QColor);
 
 };
 

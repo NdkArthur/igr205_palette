@@ -17,6 +17,7 @@ PaletteWidget::PaletteWidget(QWidget *parent) :
 
     mainLayout->addWidget(buttonZone);
     mainLayout->addWidget(canva);
+    connect(buttonZone, SIGNAL(tesselChanged(QColor)), this, SLOT(sendColorPicked(QColor)));
 
 
 }

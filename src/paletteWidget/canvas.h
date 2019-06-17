@@ -52,7 +52,10 @@ signals:
 public slots:
     void paintEvent(QPaintEvent*);
     void setPickedModeOn(){pickedModeIsOn = true; selectedBlobEdit = nullptr; setCursor(QCursor(Qt::BlankCursor)); update();}
-    void setPickedModeOff(){pickedModeIsOn = false; setCursor(QCursor(Qt::ArrowCursor)); update();}
+    void setPickedModeOff(){
+        pickedModeIsOn = false;
+        setCursor(QCursor(Qt::ArrowCursor));
+        update();}
 
 protected:
     void mousePressEvent(QMouseEvent * e);

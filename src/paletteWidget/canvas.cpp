@@ -10,16 +10,6 @@
 
 Canvas::Canvas(QWidget *parent) : QWidget(parent)
 {
-//    mac = new QStateMachine();
-
-//    passiveState = new QState(mac);
-//    moveBlob = new QState(mac);
-//    editBlob = new QState(mac);
-
-//    passiveState->addTransition(this,SIGNAL(dragOn(Blob*)),moveBlob);
-//    passiveState->addTransition(this, SIGNAL(doubleClickOn(Blob*)), editBlob);
-//    moveBlob->addTransition(this,SIGNAL(dragOff()),passiveState);
-//    editBlob->addTransition(this, SIGNAL(doubleClickOff()), passiveState);
 
     setMinimumSize(canvasWidth,canvasHeight);
     std::vector<Blob*> blobs= std::vector<Blob*>();
@@ -49,10 +39,6 @@ void Canvas::mousePressEvent(QMouseEvent * e){
         }
     }
 
-//    else {
-//        currentPos = e->pos();
-//        emit tesselPicked(new Tessel(dish, e->pos()));
-//    }
     update();
 }
 

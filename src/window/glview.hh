@@ -25,6 +25,7 @@ public:
 
 signals:
   void loadedModel(Model*);
+  void clicked(QVector2D);
 
 protected:
   void mouseMoveEvent(QMouseEvent *event) override;

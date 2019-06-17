@@ -9,12 +9,20 @@ class PaletteWidget : public QWidget
 {
     Q_OBJECT
 
-    public:
+public:
         explicit PaletteWidget(QWidget *parent = 0);
         ~PaletteWidget();
+public slots:
+    void sendColorPicked(QColor c) {
+        emit colorPicked(c);
+    };
 
-    private:
+signals:
+    void colorPicked(QColor);
+
+private:
         QGroupBox * buttonZone;
+
 };
 
 #endif // PALETTEWIDGET_H

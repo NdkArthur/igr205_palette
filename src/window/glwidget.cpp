@@ -1,5 +1,5 @@
 #include "glwidget.h"
-#include "model.hh"
+
 
 
 #include <tiny_gltf.h>
@@ -33,9 +33,7 @@ const char *frags_filename = PROJECT_DIR "/src/shaders/textureWidget.frag";
 
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent){
-    xRot = 0;
-    yRot = 0;
-    zRot = 0;
+
 
 }
 
@@ -78,6 +76,14 @@ void GLWidget::render(){
 
     color_map->bind(tex_unit_count);
     program_.setUniformValue("color_map", tex_unit_count);
+    GLfloat position[2];
+    position[0] = currentTextCoord.x();
+    position[1] = currentTextCoord.y();
+    program_.setUniformValue("click_coord", QPointF(currentTextCoord.x(), currentTextCoord.y()));
+    float r = brushColor.redF();
+    float g = brushColor.greenF();
+    float b = brushColor.blueF();
+    program_.setUniformValue("brush_color",r , g, b);
     vao_ptr->bind();
     f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     vao_ptr->release();
@@ -97,11 +103,25 @@ void GLWidget::paintGL(){
     render();
 }
 
+void GLWidget::updateTextCoord(QVector2D tc){
+    currentTextCoord = tc;
+    std::cout << "--- Tex coord X: " <<currentTextCoord.x()<< " | Y: " <<currentTextCoord.y() << std::endl;
+    paintGL();
+    update();
+}
+
 void GLWidget::mousePressEvent(QMouseEvent *event){
+    if (event->button() == Qt::LeftButton)
+    {
+        moveIsOn = true;
+
+    }
 
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event){
+
+    updateTextCoord(QVector2D(float(event->pos().x())/width(), 1-float(event->pos().y())/height()));
 
 }
 

@@ -47,4 +47,6 @@ MainWindow::MainWindow()
     tool_bar->addWidget(checkbox);
     connect(checkbox, SIGNAL(toggled(bool)), gl_view_, SLOT(toggleColorMap(bool)));
     connect(gl_view_, SIGNAL(loadedModel(Model*)), glWidget, SLOT(updateTexture(Model*)));
+    connect(gl_view_, SIGNAL(clicked(QVector2D)), glWidget, SLOT(updateTextCoord(QVector2D)));
+    connect(palette, SIGNAL(colorPicked(QColor)), glWidget, SLOT(setBrushColor(QColor)));
 }

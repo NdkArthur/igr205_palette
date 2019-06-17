@@ -8,7 +8,7 @@
 #include <memory>
 #include <QOpenGLTexture>
 #include "alignedbox.hh"
-
+#include <iostream>
 class QOpenGLShaderProgram;
 
 // Represents a gltf 2.0 model
@@ -28,8 +28,19 @@ public:
   // Get bounding box of scene s
   AlignedBox sceneAlignedBox(int s);
 
- QOpenGLTexture * getColormap(){
+  QOpenGLTexture * getColormap(){
+      std::cout<< "material size :" << materials_.size() << std::endl;
+      std::cout<< "material size :" << materials_.size() << std::endl;
+      std::cout<< "material size :" << materials_.size() << std::endl;
+      std::cout<< "material size :" << materials_.size() << std::endl;
+      std::cout<< "material size :" << materials_.size() << std::endl;
+      std::cout<< "material size :" << materials_.size() << std::endl;
       auto & m = materials_[0];
+
+      if (!m.color_map) {
+          std::cout<< "color map not initialized:"<< std::endl;
+      }
+
       QOpenGLTexture * c = m.color_map.get();
       return c;}
 

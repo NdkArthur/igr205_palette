@@ -44,6 +44,7 @@ void GLView::initializeGL()
     light_colors[2] = QVector3D(0.8, 1., 0.8);
 
     only_color_map = false;
+    emit loadedModel(model.get());
 }
 
 void GLView::paintGL()

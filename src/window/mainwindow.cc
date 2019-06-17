@@ -32,7 +32,7 @@ MainWindow::MainWindow()
     mainLayout->addLayout(toolLayout);
 
 
-    glWidget = new GLWidget(this, gl_view_->getModel());
+    glWidget = new GLWidget(this);
 
     visuLayout->addWidget(glWidget);
     visuLayout->addStretch(5);
@@ -46,4 +46,5 @@ MainWindow::MainWindow()
     QCheckBox *checkbox = new QCheckBox("Only Color Map", tool_bar);
     tool_bar->addWidget(checkbox);
     connect(checkbox, SIGNAL(toggled(bool)), gl_view_, SLOT(toggleColorMap(bool)));
+    connect(gl_view_, SIGNAL(loadedModel(Model*)), glWidget, SLOT(updateTexture(Model*)));
 }

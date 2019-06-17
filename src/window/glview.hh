@@ -22,6 +22,9 @@ public:
 
   Model * getModel(){return model.get();}
 
+signals:
+  void loadedModel(Model*);
+
 protected:
   void mouseMoveEvent(QMouseEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;

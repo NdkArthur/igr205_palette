@@ -26,18 +26,17 @@
 #include <cstdlib>
 
 #include <algorithm>
-#include <GL/glut.h>
 #include <float.h>
 
 const char *verts_filename = PROJECT_DIR "/src/shaders/textureWidget.vert";
 const char *frags_filename = PROJECT_DIR "/src/shaders/textureWidget.frag";
 
 
-GLWidget::GLWidget(QWidget *parent, Model* m) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent){
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent){
     xRot = 0;
     yRot = 0;
     zRot = 0;
-    model = m;
+
 }
 
 QSize GLWidget::minimumSizeHint() const{
@@ -50,69 +49,58 @@ QSize GLWidget::sizeHint() const{
 
 
 void GLWidget::initializeGL(){
+    makeCurrent();
     QOpenGLFunctions * f = QOpenGLContext::currentContext()->functions();
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glClearColor(0.3f, 0.f, 0.f, 1.0f);
 
     std::cout<<"###\nintialized GL widget : start" <<std::endl;
 
-    f->glEnable(GL_DEPTH_TEST);
-    std::cout<<"load model : start" <<std::endl;
-//    glview.model;
-//    model = Model::load(PROJECT_DIR "/assets/WaterBottle/WaterBottle.gltf");
-    std::cout<<"load model : end" <<std::endl;
     std::cout<<"load shaders : start" <<std::endl;
     program_.removeAllShaders();
     program_.addShaderFromSourceFile(QOpenGLShader::Vertex, verts_filename);
     program_.addShaderFromSourceFile(QOpenGLShader::Fragment, frags_filename);
     std::cout<<"load shaders : end" <<std::endl;
-
-    std::cout<<"send attributes to GPU : start" <<std::endl;
-    color_map = model->getColormap();
-    int tex_unit_count = 0;
-
-    color_map->bind(tex_unit_count);
-    program_.setUniformValue("color_map", tex_unit_count);
-
-
-    m_posAttrib = program_.attributeLocation("vtx_positions");
-    std::cout<<"send attributes to GPU : end" <<std::endl;
     program_.link();
     std::cout<<"intialized GL widget : end" <<std::endl;
+    vao_ptr = std::make_unique<QOpenGLVertexArrayObject>(new QOpenGLVertexArrayObject() );
+    vao_ptr->create();
+    doneCurrent();
+
+}
+
+void GLWidget::updateTexture(Model* model) {
+
+    std::cout<<"get color map : start" <<std::endl;
+    color_map = model->getColormap();
+    std::cout<<"send attributes to GPU : start 2" <<std::endl;
+
 }
 
 void GLWidget::render(){
+    makeCurrent();
     QOpenGLFunctions * f = QOpenGLContext::currentContext()->functions();
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    f->glClearColor(0.3f, 0.f, 0.f, 1.0f);
+    f->glClear(GL_COLOR_BUFFER_BIT );
+
 
     program_.bind();
-    GLfloat vertices[12] = {
-        -1.0f, 1.0f, 0.0f,
-        1.0f, 1.0f, 0.0f,
-        1.0f,-1.0f, 0.0f,
-        -1.0f,-1.0f, 0.0f
-    };
 
-    f->glVertexAttribPointer(m_posAttrib, 3, GL_FLOAT, GL_FALSE, 0, vertices);
-    f->glEnableVertexAttribArray(0);
-    f->glDrawArrays(GL_TRIANGLES, 0, 4);
-    f->glDisableVertexAttribArray(0);
-
+    int tex_unit_count = 0;
+    std::cout<<"send attributes to GPU : start 1" <<std::endl;
+    color_map->bind(tex_unit_count);
+    program_.setUniformValue("color_map", tex_unit_count);
+    vao_ptr->bind();
+    f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    vao_ptr->release();
     program_.release();
+    doneCurrent();
 }
 
 void GLWidget::resizeGL(int width, int height){
+    makeCurrent();
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glViewport(0, 0, width, height);
+    doneCurrent();
 
-//    int side = qMin(width, height);
-//    f->glViewport((width - side) / 2, (height - side) / 2, side, side);
-//    f->glMatrixMode(GL_PROJECTION);
-//    f->glLoadIdentity();
-//    f->glOrtho(-0.5, +0.5, +0.5, -0.5, 4.0, 15.0);
-//    f->glMatrixMode(GL_MODELVIEW);
-//    f->glLoadIdentity();
 }
 
 void GLWidget::paintGL(){

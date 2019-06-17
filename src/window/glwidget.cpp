@@ -105,27 +105,3 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
 
 }
 
-//bool GLWidget::loadProgram()
-//{
-//    program_.removeAllShaders();
-//    program_.addShaderFromSourceFile(QOpenGLShader::Vertex, verts_filename);
-//    program_.addShaderFromSourceFile(QOpenGLShader::Fragment, frags_filename);
-//    bool link_res = program_.link();
-//    if (link_res)
-//        last_link_ = QDateTime::currentDateTime();
-
-//    return link_res;
-//}
-
-void GLWidget::loadTexture(QString textureName)
-{
-    QImage Texture;
-    QImage TempTexture;
-    TempTexture.load(textureName);
-    Texture = QGLWidget::convertToGLFormat(TempTexture);
-//    glGenTextures( 1, &m_texture[0] );
-//    glBindTexture( GL_TEXTURE_2D, m_texture[0] );
-//    glTexImage2D( GL_TEXTURE_2D, 0, 3, Texture.width(), Texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.bits() );
-//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-}

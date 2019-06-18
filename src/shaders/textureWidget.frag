@@ -15,6 +15,6 @@ void main() {
         out_color = vec4(texture(color_map, vtx_texcoord).xyz, 1.);
        }
     else {
-        out_color = vec4(brush_color,0.);
+        out_color = vec4(brush_color,1.);
     }
 }

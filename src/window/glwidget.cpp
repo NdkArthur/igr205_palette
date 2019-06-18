@@ -65,7 +65,7 @@ void GLWidget::updateTexture(Model* model) {
 }
 
 void GLWidget::render(){
-    makeCurrent();
+
     QOpenGLFunctions * f = QOpenGLContext::currentContext()->functions();
     f->glClear(GL_COLOR_BUFFER_BIT );
 
@@ -88,7 +88,7 @@ void GLWidget::render(){
     f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     vao_ptr->release();
     program_.release();
-    doneCurrent();
+
 }
 
 void GLWidget::resizeGL(int width, int height){
@@ -100,22 +100,47 @@ void GLWidget::resizeGL(int width, int height){
 }
 
 void GLWidget::paintGL(){
+    makeCurrent();
     render();
+    doneCurrent();
 }
 
 void GLWidget::updateTextCoord(QVector2D tc){
     currentTextCoord = tc;
-    std::cout << "--- Tex coord X: " <<currentTextCoord.x()<< " | Y: " <<currentTextCoord.y() << std::endl;
-    paintGL();
+    makeCurrent();
+    draw();
+    doneCurrent();
     update();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event){
-    if (event->button() == Qt::LeftButton)
-    {
-        moveIsOn = true;
+    if (event->button() == Qt::RightButton)
+    {   makeCurrent();
+        draw();
+        doneCurrent();
 
     }
+
+}
+
+void GLWidget::draw() {
+
+
+//    std::cout << "# Event detected" <<std::endl;
+    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
+//    std::cout << "###" <<std::endl;
+    if (fbo->bind()) {
+        render();
+        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+        QImage textureIm = fbo->toImage(false);
+        color_map = new QOpenGLTexture(textureIm, QOpenGLTexture::DontGenerateMipMaps);
+        fbo->release();
+//        std::cout << "###" <<std::endl;
+
+    }
+    delete fbo;
+
+
 
 }
 

@@ -36,6 +36,7 @@ public slots:
         brushColor = c;
         update();
     }
+    void draw();
 
 protected:
     void initializeGL();

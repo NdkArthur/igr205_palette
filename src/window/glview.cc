@@ -161,22 +161,14 @@ void GLView::mouseMoveEvent(QMouseEvent *event)
     mouse_pos.ry() /= height_;
     if (trackball_.track(mouse_pos))
         update();
-}
 
-void GLView::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::RightButton)
-    {
-        trackball_.start();
-    }
-
-    if (event->button() == Qt::LeftButton)
+    if (event->buttons() & Qt::LeftButton)
     {
         makeCurrent();
-        std::cout << "# Event detected" <<std::endl;
+//        std::cout << "# Event detected" <<std::endl;
         QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(QSize(int(width_), int(height_)),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
         if (fbo->bind()) {
-            std::cout << "Fbo binded" <<std::endl;
+//            std::cout << "Fbo binded" <<std::endl;
 
             QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
             f->glClearColor(0, 0, 0, 0);
@@ -194,15 +186,15 @@ void GLView::mousePressEvent(QMouseEvent *event)
             }
             float pix[4];
             f->glReadPixels(event->pos().x(),int(height_) - event->pos().y(), 1, 1, GL_RGBA, GL_FLOAT, pix);
-            std::cout << "Fbo rendered" <<std::endl;
+//            std::cout << "Fbo rendered" <<std::endl;
 //            QImage textCoord = fbo->toImage();
 //            textCoord.save("frameBuffetTest.png");
             fbo->release();
-            std::cout << "Fbo to qimage done" <<std::endl;
-            std::cout << "Frame buffer dim w: " << width_<< " | h: " << height_<<std::endl;
-            std::cout << "Clicked pos X: " << event->pos().x()<< " | Y: " <<event->pos().y() <<std::endl;
-            std::cout << "Tex coord X: " <<pix[0]<< " | Y: " <<pix[1] << "| test:" << pix[3]<<std::endl;
-            std::cout << "###" <<std::endl;
+//            std::cout << "Fbo to qimage done" <<std::endl;
+//            std::cout << "Frame buffer dim w: " << width_<< " | h: " << height_<<std::endl;
+//            std::cout << "Clicked pos X: " << event->pos().x()<< " | Y: " <<event->pos().y() <<std::endl;
+//            std::cout << "Tex coord X: " <<pix[0]<< " | Y: " <<pix[1] << "| test:" << pix[3]<<std::endl;
+//            std::cout << "###" <<std::endl;
             emit clicked(QVector2D(pix[0], pix[1]));
             f->glClearColor(0.2, 0.2, 0.2, 1);
 
@@ -211,6 +203,15 @@ void GLView::mousePressEvent(QMouseEvent *event)
         doneCurrent();
 
     }
+}
+
+void GLView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton)
+    {
+        trackball_.start();
+    }
+
 }
 
 void GLView::mouseReleaseEvent(QMouseEvent *event)

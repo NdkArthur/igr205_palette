@@ -28,11 +28,14 @@
 #include <algorithm>
 #include <float.h>
 
+#define GL_FUNCTION_DRAW
+
 const char *verts_filename = PROJECT_DIR "/src/shaders/textureWidget.vert";
 const char *frags_filename = PROJECT_DIR "/src/shaders/textureWidget.frag";
 
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent){
+
 
 }
 
@@ -64,7 +67,8 @@ void GLWidget::updateTexture(Model* model) {
 
 void GLWidget::render(){
     QOpenGLFunctions * f = QOpenGLContext::currentContext()->functions();
-    f->glClear(GL_COLOR_BUFFER_BIT);
+    f->glClear(GL_COLOR_BUFFER_BIT );
+
 
     program_.bind();
 
@@ -77,17 +81,78 @@ void GLWidget::render(){
     position[0] = currentTextCoord.x();
     position[1] = currentTextCoord.y();
     program_.setUniformValue("click_coord", QPointF(currentTextCoord.x(), currentTextCoord.y()));
+    program_.setUniformValue("brush_color", float(brushColor.redF()) , float(brushColor.greenF()), float(brushColor.blueF()));
+    program_.setUniformValue("brush_width",brushWidth);
 
-    float r = brushColor.redF();
-    float g = brushColor.greenF();
-    float b = brushColor.blueF();
-
-    program_.setUniformValue("brush_color",r , g, b);
     vao_ptr->bind();
     f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     vao_ptr->release();
     program_.release();
 }
+
+#ifdef GL_FUNCTION_DRAW
+
+void GLWidget::draw() {
+
+
+    QOpenGLFramebufferObjectFormat format ;
+    format.setInternalTextureFormat(QOpenGLTexture::SRGB8_Alpha8);
+    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject( color_map->width(),color_map->height(), format);
+
+//    std::cout << "###" <<std::endl;
+    if (fbo->bind()) {
+        QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
+        f->glViewport(0,0,color_map->width(),color_map->height());
+        f->glEnable(GL_FRAMEBUFFER_SRGB);
+        render();
+        static int lala = 0 ;
+        if (lala<2) {
+            QImage textCoord = fbo->toImage();
+            textCoord.save("frameBuffetTest.png");
+            lala += 1;
+        }
+
+
+        f->glCopyImageSubData(fbo->texture(),GL_TEXTURE_2D,0,0,0,0,
+                              color_map->textureId(),GL_TEXTURE_2D,0,0,0,0,color_map->width(),color_map->height(),1);
+        fbo->release();
+        f->glViewport(0,0,width(),height());
+//        std::cout << "###" <<std::endl;
+
+    }
+    delete fbo;
+
+
+
+}
+#else
+
+void GLWidget::draw() {
+
+
+//    std::cout << "# Event detected" <<std::endl;
+    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
+//    std::cout << "###" <<std::endl;
+    if (fbo->bind()) {
+        render();
+        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+        QImage textureIm = fbo->toImage(false);
+        color_map->destroy();
+        color_map->create();
+        color_map->setSize(textureIm.width(), textureIm.height());
+
+        color_map->setData(textureIm, QOpenGLTexture::DontGenerateMipMaps);
+        fbo->release();
+//        std::cout << "###" <<std::endl;
+
+    }
+    delete fbo;
+
+
+
+}
+
+#endif
 
 void GLWidget::resizeGL(int width, int height){
     makeCurrent();
@@ -118,21 +183,18 @@ void GLWidget::mousePressEvent(QMouseEvent *event){
     }
 }
 
-void GLWidget::draw() {
-    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
-    if (fbo->bind()) {
-        render();
-        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-        QImage textureIm = fbo->toImage(false);
-        color_map = new QOpenGLTexture(textureIm, QOpenGLTexture::DontGenerateMipMaps);
-        fbo->release();
+
     }
-    delete fbo;
+
 }
+
+
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event){
 
-    updateTextCoord(QVector2D(float(event->pos().x())/width(), 1-float(event->pos().y())/height()));
-
+    if (event->buttons() & Qt::LeftButton) {
+        updateTextCoord(QVector2D(float(event->pos().x())/width(), 1-float(event->pos().y())/height()));
+        emit drawn();
+    }
 }
 

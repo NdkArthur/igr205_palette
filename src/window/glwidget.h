@@ -23,17 +23,28 @@ class GLWidget : public QOpenGLWidget{
 
 public:
     GLWidget(QWidget *parent = 0);
-    ~GLWidget(){}
+    ~GLWidget(){
+        makeCurrent();
+
+    }
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
     void render();
+
+signals:
+    void drawn();
+
 public slots:
     void updateTexture(Model*);
     void updateTextCoord(QVector2D tc);
     void setBrushColor(QColor c) {
         brushColor = c;
+        update();
+    }
+    void setBrushWidth(int w) {
+        brushWidth = float(w)/160.0;
         update();
     }
     void draw();
@@ -49,8 +60,9 @@ private:
 
     QOpenGLTexture * color_map;
     bool loadProgram();
-    QVector2D currentTextCoord = QVector2D(0,0);
-    QColor brushColor = QColor(125, 125, 125);;
+    QVector2D currentTextCoord = QVector2D(42,42);
+    QColor brushColor = QColor(125, 125, 125);
+    float brushWidth = 0.001;
 
     QOpenGLShaderProgram program_;
     QDateTime last_link_;

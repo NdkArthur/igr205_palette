@@ -17,15 +17,6 @@ MainWindow::MainWindow()
     toolLayout->addWidget(palette);
     toolLayout->addStretch(5);
 
-
-
-//    connect(xSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setXRotation(int)));
-//    connect(glWidget, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
-//    connect(ySlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setYRotation(int)));
-//    connect(glWidget, SIGNAL(yRotationChanged(int)), ySlider, SLOT(setValue(int)));
-//    connect(zSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setZRotation(int)));
-//    connect(glWidget, SIGNAL(zRotationChanged(int)), zSlider, SLOT(setValue(int)));
-
     gl_view_ = new GLView(this);
     visuLayout->addWidget(gl_view_);
     mainLayout->addLayout(visuLayout);
@@ -45,8 +36,19 @@ MainWindow::MainWindow()
     // Setup CheckBox for toggle pbr/color map rendering
     QCheckBox *checkbox = new QCheckBox("Only Color Map", tool_bar);
     tool_bar->addWidget(checkbox);
+    tool_bar->addSeparator();
+
+    QSlider *penWidth = new QSlider(Qt::Orientation::Horizontal,this);
+    penWidth->setRange(1,10);
+    tool_bar->addWidget(new QLabel("Pen width"));
+    tool_bar->addWidget(penWidth);
+
     connect(checkbox, SIGNAL(toggled(bool)), gl_view_, SLOT(toggleColorMap(bool)));
     connect(gl_view_, SIGNAL(loadedModel(Model*)), glWidget, SLOT(updateTexture(Model*)));
     connect(gl_view_, SIGNAL(clicked(QVector2D)), glWidget, SLOT(updateTextCoord(QVector2D)));
     connect(palette, SIGNAL(colorPicked(QColor)), glWidget, SLOT(setBrushColor(QColor)));
+    connect(penWidth, SIGNAL(valueChanged(int)), glWidget, SLOT(setBrushWidth(int)));
+    connect(glWidget, SIGNAL(drawn()), gl_view_, SLOT(update()));
+
 }
+

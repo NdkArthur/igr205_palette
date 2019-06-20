@@ -28,6 +28,8 @@
 #include <algorithm>
 #include <float.h>
 
+//#define GL_FUNCTION_DRAW
+
 const char *verts_filename = PROJECT_DIR "/src/shaders/textureWidget.vert";
 const char *frags_filename = PROJECT_DIR "/src/shaders/textureWidget.frag";
 
@@ -80,16 +82,73 @@ void GLWidget::render(){
     position[0] = currentTextCoord.x();
     position[1] = currentTextCoord.y();
     program_.setUniformValue("click_coord", QPointF(currentTextCoord.x(), currentTextCoord.y()));
-    float r = brushColor.redF();
-    float g = brushColor.greenF();
-    float b = brushColor.blueF();
-    program_.setUniformValue("brush_color",r , g, b);
+    program_.setUniformValue("brush_color", float(brushColor.redF()) , float(brushColor.greenF()), float(brushColor.blueF()));
+    program_.setUniformValue("brush_width",brushWidth);
+
     vao_ptr->bind();
     f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     vao_ptr->release();
     program_.release();
 
 }
+
+#ifdef GL_FUNCTION_DRAW
+
+void GLWidget::draw() {
+
+
+//    std::cout << "# Event detected" <<std::endl;
+
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    unsigned int fbo;
+    f->glGenFramebuffers(1, &fbo);
+    std::cout << "start ###" <<std::endl;
+    f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    if (true) {
+        f->glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_map->textureId(), 0 );
+        f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        f->glViewport( 0, 0, width(), height());
+        render();
+        f->glCopyTexSubImage2D(color_map->textureId(),0,0,0,0,0,width(),height());
+        f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        std::cout << "end ###" <<std::endl;
+
+    }
+    f->glDeleteFramebuffers( 1, &fbo );
+
+
+
+}
+#else
+
+void GLWidget::draw() {
+
+
+//    std::cout << "# Event detected" <<std::endl;
+    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
+//    std::cout << "###" <<std::endl;
+    if (fbo->bind()) {
+        render();
+        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+        QImage textureIm = fbo->toImage(false);
+        color_map->destroy();
+        color_map->create();
+        color_map->setSize(textureIm.width(), textureIm.height());
+
+        color_map->setData(textureIm, QOpenGLTexture::DontGenerateMipMaps);
+        fbo->release();
+//        std::cout << "###" <<std::endl;
+
+    }
+    delete fbo;
+
+
+
+}
+
+#endif
 
 void GLWidget::resizeGL(int width, int height){
     makeCurrent();
@@ -123,30 +182,13 @@ void GLWidget::mousePressEvent(QMouseEvent *event){
 
 }
 
-void GLWidget::draw() {
 
-
-//    std::cout << "# Event detected" <<std::endl;
-    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
-//    std::cout << "###" <<std::endl;
-    if (fbo->bind()) {
-        render();
-        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-        QImage textureIm = fbo->toImage(false);
-        color_map = new QOpenGLTexture(textureIm, QOpenGLTexture::DontGenerateMipMaps);
-        fbo->release();
-//        std::cout << "###" <<std::endl;
-
-    }
-    delete fbo;
-
-
-
-}
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event){
 
-    updateTextCoord(QVector2D(float(event->pos().x())/width(), 1-float(event->pos().y())/height()));
-
+    if (event->buttons() & Qt::LeftButton) {
+        updateTextCoord(QVector2D(float(event->pos().x())/width(), 1-float(event->pos().y())/height()));
+        emit drawn();
+    }
 }
 

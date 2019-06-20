@@ -165,10 +165,9 @@ void GLView::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons() & Qt::LeftButton)
     {
         makeCurrent();
-//        std::cout << "# Event detected" <<std::endl;
+
         QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(QSize(int(width_), int(height_)),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
         if (fbo->bind()) {
-//            std::cout << "Fbo binded" <<std::endl;
 
             QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
             f->glClearColor(0, 0, 0, 0);
@@ -189,6 +188,7 @@ void GLView::mouseMoveEvent(QMouseEvent *event)
 //            std::cout << "Fbo rendered" <<std::endl;
 //            QImage textCoord = fbo->toImage();
 //            textCoord.save("frameBuffetTest.png");
+            f->glClearColor(0.2, 0.2, 0.2, 1);
             fbo->release();
 //            std::cout << "Fbo to qimage done" <<std::endl;
 //            std::cout << "Frame buffer dim w: " << width_<< " | h: " << height_<<std::endl;
@@ -201,6 +201,7 @@ void GLView::mouseMoveEvent(QMouseEvent *event)
         }
         delete fbo;
         doneCurrent();
+        update();
 
     }
 }

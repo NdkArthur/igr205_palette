@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <float.h>
 
-//#define GL_FUNCTION_DRAW
+#define GL_FUNCTION_DRAW
 
 const char *verts_filename = PROJECT_DIR "/src/shaders/textureWidget.vert";
 const char *frags_filename = PROJECT_DIR "/src/shaders/textureWidget.frag";
@@ -97,26 +97,32 @@ void GLWidget::render(){
 void GLWidget::draw() {
 
 
-//    std::cout << "# Event detected" <<std::endl;
+    QOpenGLFramebufferObjectFormat format ;
+    format.setInternalTextureFormat(QOpenGLTexture::SRGB8_Alpha8);
+    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject( color_map->width(),color_map->height(), format);
 
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-    unsigned int fbo;
-    f->glGenFramebuffers(1, &fbo);
-    std::cout << "start ###" <<std::endl;
-    f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    if (true) {
-        f->glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_map->textureId(), 0 );
-        f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        f->glViewport( 0, 0, width(), height());
+//    std::cout << "###" <<std::endl;
+    if (fbo->bind()) {
+        QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
+        f->glViewport(0,0,color_map->width(),color_map->height());
+        f->glEnable(GL_FRAMEBUFFER_SRGB);
         render();
-        f->glCopyTexSubImage2D(color_map->textureId(),0,0,0,0,0,width(),height());
-        f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+        static int lala = 0 ;
+        if (lala<2) {
+            QImage textCoord = fbo->toImage();
+            textCoord.save("frameBuffetTest.png");
+            lala += 1;
+        }
 
-        std::cout << "end ###" <<std::endl;
+
+        f->glCopyImageSubData(fbo->texture(),GL_TEXTURE_2D,0,0,0,0,
+                              color_map->textureId(),GL_TEXTURE_2D,0,0,0,0,color_map->width(),color_map->height(),1);
+        fbo->release();
+        f->glViewport(0,0,width(),height());
+//        std::cout << "###" <<std::endl;
 
     }
-    f->glDeleteFramebuffers( 1, &fbo );
+    delete fbo;
 
 
 

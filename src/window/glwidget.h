@@ -52,16 +52,12 @@ private:
     QVector2D currentTextCoord = QVector2D(0,0);
     QColor brushColor = QColor(125, 125, 125);;
 
-
     QOpenGLShaderProgram program_;
     QDateTime last_link_;
 
     float fov_ = 45.0;
     bool moveIsOn = false;
 
-    void loadTexture(QString textureName);
-
-    GLuint m_posAttrib;
     std::unique_ptr<QOpenGLVertexArrayObject>  vao_ptr;
 };
 

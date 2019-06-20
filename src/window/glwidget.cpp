@@ -34,7 +34,6 @@ const char *frags_filename = PROJECT_DIR "/src/shaders/textureWidget.frag";
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent){
 
-
 }
 
 QSize GLWidget::minimumSizeHint() const{
@@ -57,7 +56,6 @@ void GLWidget::initializeGL(){
     vao_ptr = std::make_unique<QOpenGLVertexArrayObject>(new QOpenGLVertexArrayObject() );
     vao_ptr->create();
     doneCurrent();
-
 }
 
 void GLWidget::updateTexture(Model* model) {
@@ -65,10 +63,8 @@ void GLWidget::updateTexture(Model* model) {
 }
 
 void GLWidget::render(){
-
     QOpenGLFunctions * f = QOpenGLContext::currentContext()->functions();
-    f->glClear(GL_COLOR_BUFFER_BIT );
-
+    f->glClear(GL_COLOR_BUFFER_BIT);
 
     program_.bind();
 
@@ -76,19 +72,21 @@ void GLWidget::render(){
 
     color_map->bind(tex_unit_count);
     program_.setUniformValue("color_map", tex_unit_count);
+
     GLfloat position[2];
     position[0] = currentTextCoord.x();
     position[1] = currentTextCoord.y();
     program_.setUniformValue("click_coord", QPointF(currentTextCoord.x(), currentTextCoord.y()));
+
     float r = brushColor.redF();
     float g = brushColor.greenF();
     float b = brushColor.blueF();
+
     program_.setUniformValue("brush_color",r , g, b);
     vao_ptr->bind();
     f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     vao_ptr->release();
     program_.release();
-
 }
 
 void GLWidget::resizeGL(int width, int height){
@@ -96,7 +94,6 @@ void GLWidget::resizeGL(int width, int height){
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glViewport(0, 0, width, height);
     doneCurrent();
-
 }
 
 void GLWidget::paintGL(){
@@ -118,30 +115,19 @@ void GLWidget::mousePressEvent(QMouseEvent *event){
     {   makeCurrent();
         draw();
         doneCurrent();
-
     }
-
 }
 
 void GLWidget::draw() {
-
-
-//    std::cout << "# Event detected" <<std::endl;
     QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
-//    std::cout << "###" <<std::endl;
     if (fbo->bind()) {
         render();
         QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
         QImage textureIm = fbo->toImage(false);
         color_map = new QOpenGLTexture(textureIm, QOpenGLTexture::DontGenerateMipMaps);
         fbo->release();
-//        std::cout << "###" <<std::endl;
-
     }
     delete fbo;
-
-
-
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event){

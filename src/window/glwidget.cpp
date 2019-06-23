@@ -1,7 +1,5 @@
 #include "glwidget.h"
 
-
-
 #include <tiny_gltf.h>
 #include <QDir>
 #include <QDebug>
@@ -28,11 +26,10 @@
 #include <algorithm>
 #include <float.h>
 
-#define GL_FUNCTION_DRAW
 
 const char *verts_filename = PROJECT_DIR "/src/shaders/textureWidget.vert";
 const char *frags_filename = PROJECT_DIR "/src/shaders/textureWidget.frag";
-
+const char *draw_frags_filename = PROJECT_DIR "/src/shaders/draw.frag";
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent){
 
@@ -56,6 +53,11 @@ void GLWidget::initializeGL(){
     program_.addShaderFromSourceFile(QOpenGLShader::Vertex, verts_filename);
     program_.addShaderFromSourceFile(QOpenGLShader::Fragment, frags_filename);
     program_.link();
+
+    draw_program_.removeAllShaders();
+    draw_program_.addShaderFromSourceFile(QOpenGLShader::Vertex, verts_filename);
+    draw_program_.addShaderFromSourceFile(QOpenGLShader::Fragment, draw_frags_filename);
+    draw_program_.link();
     vao_ptr = std::make_unique<QOpenGLVertexArrayObject>(new QOpenGLVertexArrayObject() );
     vao_ptr->create();
     doneCurrent();
@@ -71,20 +73,12 @@ void GLWidget::render(){
     QOpenGLFunctions * f = QOpenGLContext::currentContext()->functions();
     f->glClear(GL_COLOR_BUFFER_BIT );
 
-
     program_.bind();
-
     int tex_unit_count = 0;
 
     color_map->bind(tex_unit_count);
     program_.setUniformValue("color_map", tex_unit_count);
-    GLfloat position[2];
-    position[0] = currentTextCoord.x();
-    position[1] = currentTextCoord.y();
-    program_.setUniformValue("click_coord", QPointF(currentTextCoord.x(), currentTextCoord.y()));
-    program_.setUniformValue("brush_color", float(brushColor.redF()) , float(brushColor.greenF()), float(brushColor.blueF()));
-    program_.setUniformValue("brush_width",brushWidth);
-
+    
     vao_ptr->bind();
     f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     vao_ptr->release();
@@ -92,7 +86,7 @@ void GLWidget::render(){
 
 }
 
-#ifdef GL_FUNCTION_DRAW
+
 
 void GLWidget::draw() {
 
@@ -101,12 +95,30 @@ void GLWidget::draw() {
     format.setInternalTextureFormat(QOpenGLTexture::SRGB8_Alpha8);
     QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject( color_map->width(),color_map->height(), format);
 
-//    std::cout << "###" <<std::endl;
     if (fbo->bind()) {
         QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
         f->glViewport(0,0,color_map->width(),color_map->height());
         f->glEnable(GL_FRAMEBUFFER_SRGB);
-        render();
+
+        f->glClear(GL_COLOR_BUFFER_BIT );
+
+
+        draw_program_.bind();
+        int tex_unit_count = 0;
+        color_map->bind(tex_unit_count);
+        draw_program_.setUniformValue("color_map", tex_unit_count);
+        GLfloat position[2];
+        position[0] = currentTextCoord.x();
+        position[1] = currentTextCoord.y();
+        draw_program_.setUniformValue("click_coord", QPointF(currentTextCoord.x(), currentTextCoord.y()));
+        draw_program_.setUniformValue("brush_color", float(brushColor.redF()) , float(brushColor.greenF()), float(brushColor.blueF()));
+        draw_program_.setUniformValue("brush_width",brushWidth);
+
+        vao_ptr->bind();
+        f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        vao_ptr->release();
+        draw_program_.release();
+
         static int lala = 0 ;
         if (lala<2) {
             QImage textCoord = fbo->toImage();
@@ -119,33 +131,7 @@ void GLWidget::draw() {
                               color_map->textureId(),GL_TEXTURE_2D,0,0,0,0,color_map->width(),color_map->height(),1);
         fbo->release();
         f->glViewport(0,0,width(),height());
-//        std::cout << "###" <<std::endl;
 
-    }
-    delete fbo;
-
-
-
-}
-#else
-
-void GLWidget::draw() {
-
-
-//    std::cout << "# Event detected" <<std::endl;
-    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(size(),QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
-//    std::cout << "###" <<std::endl;
-    if (fbo->bind()) {
-        render();
-        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-        QImage textureIm = fbo->toImage(false);
-        color_map->destroy();
-        color_map->create();
-        color_map->setSize(textureIm.width(), textureIm.height());
-
-        color_map->setData(textureIm, QOpenGLTexture::DontGenerateMipMaps);
-        fbo->release();
-//        std::cout << "###" <<std::endl;
 
     }
     delete fbo;
@@ -154,7 +140,8 @@ void GLWidget::draw() {
 
 }
 
-#endif
+
+
 
 void GLWidget::resizeGL(int width, int height){
     makeCurrent();
@@ -196,5 +183,26 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event){
         updateTextCoord(QVector2D(float(event->pos().x())/width(), 1-float(event->pos().y())/height()));
         emit drawn();
     }
+}
+
+void GLWidget::save() {
+    QString fileName = QFileDialog::getSaveFileName(this,
+            tr("Save texture"), "",
+            tr("Image (*.png *.jpg);;All Files (*)"));
+    QOpenGLFramebufferObject * fbo = new QOpenGLFramebufferObject(width(), height());
+    makeCurrent();
+    if (fbo->bind()) {
+        QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
+        render();
+        QImage im = fbo->toImage();
+        im.save(fileName);
+        fbo->release();
+        f->glViewport(0,0,width(),height());
+    }
+
+    doneCurrent();
+
+
+
 }
 

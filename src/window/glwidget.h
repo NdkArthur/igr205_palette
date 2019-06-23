@@ -48,6 +48,7 @@ public slots:
         update();
     }
     void draw();
+    void save();
 
 protected:
     void initializeGL();
@@ -62,10 +63,11 @@ private:
     bool loadProgram();
     QVector2D currentTextCoord = QVector2D(42,42);
     QColor brushColor = QColor(125, 125, 125);
-    float brushWidth = 0.001;
+    float brushWidth = 0.006;
 
 
     QOpenGLShaderProgram program_;
+    QOpenGLShaderProgram draw_program_;
     QDateTime last_link_;
 
     float fov_ = 45.0;

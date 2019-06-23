@@ -14,6 +14,7 @@ MainWindow::MainWindow()
     QHBoxLayout * visuLayout = new QHBoxLayout();
     QHBoxLayout * toolLayout = new QHBoxLayout();
     palette = new PaletteWidget(this);
+    toolLayout->addStretch(5);
     toolLayout->addWidget(palette);
     toolLayout->addStretch(5);
 
@@ -43,11 +44,16 @@ MainWindow::MainWindow()
     tool_bar->addWidget(new QLabel("Pen width"));
     tool_bar->addWidget(penWidth);
 
+    QPushButton * saveButton = new QPushButton("Save");
+    tool_bar->addWidget(saveButton);
+
+
     connect(checkbox, SIGNAL(toggled(bool)), gl_view_, SLOT(toggleColorMap(bool)));
     connect(gl_view_, SIGNAL(loadedModel(Model*)), glWidget, SLOT(updateTexture(Model*)));
     connect(gl_view_, SIGNAL(clicked(QVector2D)), glWidget, SLOT(updateTextCoord(QVector2D)));
     connect(palette, SIGNAL(colorPicked(QColor)), glWidget, SLOT(setBrushColor(QColor)));
     connect(penWidth, SIGNAL(valueChanged(int)), glWidget, SLOT(setBrushWidth(int)));
+    connect(saveButton, SIGNAL(clicked()), glWidget, SLOT(save()));
     connect(glWidget, SIGNAL(drawn()), gl_view_, SLOT(update()));
 
 }

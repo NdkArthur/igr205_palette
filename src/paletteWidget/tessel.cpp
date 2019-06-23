@@ -7,5 +7,5 @@ Tessel::Tessel(Dish* d, QPoint p)
 }
 
 QColor Tessel::getColor() {
-    return QColor(dish->pixel(point));
+    return QColor(dish->getPixel(point));
 }

@@ -2,42 +2,42 @@
 #include <QColorDialog>
 #include <QLabel>
 
-DishTools::DishTools(Canvas * canv) : QGroupBox("Outils")
+DishTools::DishTools(Dish * canv) : QGroupBox("Outils")
 {
     canvas = canv;
 
-    colorSelected = new QWidget();
+    blobColorWidget = new QWidget();
     QPushButton * colorPicker = new QPushButton("Color Picker");
     QPushButton * newBlob = new QPushButton("Add Blob");
     QPushButton * blobColorPicker = new QPushButton("Blob Color");
     sizePicker = new QSlider(Qt::Horizontal);
-    colorSelected->setMaximumHeight(50);
+    blobColorWidget->setMaximumHeight(50);
     QPalette pal = palette();
-    pal.setColor(QPalette::Background, runningColor);
-    colorSelected->setAutoFillBackground(true);
-    colorSelected->setPalette(pal);
+    pal.setColor(QPalette::Background, blobColor);
+    blobColorWidget->setAutoFillBackground(true);
+    blobColorWidget->setPalette(pal);
 
-    pickedColor = new QWidget();
-    pickedColor->setMaximumHeight(50);
+    pickedColorWidget = new QWidget();
+    pickedColorWidget->setMaximumHeight(50);
     pal = palette();
     pal.setColor(QPalette::Background, QColor(254, 253, 240));
-    pickedColor->setAutoFillBackground(true);
-    pickedColor->setPalette(pal);
+    pickedColorWidget->setAutoFillBackground(true);
+    pickedColorWidget->setPalette(pal);
 
     QVBoxLayout * sideButtons = new QVBoxLayout();
     sideButtons->addWidget(new QLabel("picked color : "));
-    sideButtons->addWidget(pickedColor);
+    sideButtons->addWidget(pickedColorWidget);
     sideButtons->addWidget(colorPicker);
     sideButtons->addWidget(new QLabel("blob color : "));
-    sideButtons->addWidget(colorSelected);
+    sideButtons->addWidget(blobColorWidget);
     sideButtons->addWidget(blobColorPicker);
     sideButtons->addWidget(sizePicker);
     sideButtons->addWidget(newBlob);
 
 
-    sizePicker->setMinimum(15);
-    sizePicker->setMaximum(150);
-    sizePicker->setValue(62);
+    sizePicker->setMinimum(5);
+    sizePicker->setMaximum(20);
+    sizePicker->setValue(8);
 
     connect(colorPicker, SIGNAL(clicked()), canvas, SLOT(setPickedModeOn()));
     connect(blobColorPicker, SIGNAL(clicked()), this, SLOT(setBlobColor()));
@@ -45,7 +45,6 @@ DishTools::DishTools(Canvas * canv) : QGroupBox("Outils")
     connect(canvas, SIGNAL(doubleClickOn(Blob*)), this, SLOT(setDefaultValues(Blob *)));
     connect(newBlob, SIGNAL(clicked()), this, SLOT(addBlob()));
     connect(canvas,SIGNAL(doubleClickOn(Blob*)),this, SLOT(blobColorChange(Blob*)));
-    connect(canvas, SIGNAL(tesselPicked(Tessel*)), this, SLOT(setCurrentTessel(Tessel*)));
     setLayout(sideButtons);
 }
 
@@ -68,55 +67,56 @@ void DishTools::setBlobColor(){
     if (b) {
         QPalette pal = palette();
         QColor color = QColorDialog::getColor(b->getColor(), nullptr);
-        setRunningColor(color);
-        b->setColor(runningColor);
-        pal.setColor(QPalette::Background, runningColor);
-        colorSelected->setAutoFillBackground(true);
-        colorSelected->setPalette(pal);
+        blobColor = color;
+
+        b->setColor(blobColor);
+        pal.setColor(QPalette::Background, blobColor);
+        blobColorWidget->setAutoFillBackground(true);
+        blobColorWidget->setPalette(pal);
 
     }
     else{
-        QColor color = QColorDialog::getColor(runningColor, nullptr);
-        setRunningColor(color);
+        QColor color = QColorDialog::getColor(blobColor, nullptr);
+        blobColor = color;
         QPalette pal = palette();
-        pal.setColor(QPalette::Background, runningColor);
-        colorSelected->setAutoFillBackground(true);
-        colorSelected->setPalette(pal);
+        pal.setColor(QPalette::Background, blobColor);
+        blobColorWidget->setAutoFillBackground(true);
+        blobColorWidget->setPalette(pal);
 
     }
+    update();
     canvas->setPickedModeOff();
     canvas->update();
 }
 
 void DishTools::addBlob() {
-    Blob * b = new Blob(runningColor,
+    Blob * b = new Blob(blobColor,
                    QPoint(50, 50),
                    50);
 
     b->setRadius(sizePicker->value());
-    canvas->getDish()->addBlob(b);
-    canvas->setSelectedBlobEdit(b);
+    canvas->addBlob(b);
     canvas->setPickedModeOff();
+    canvas->paintGL();
     canvas->update();
 }
 
 void DishTools::paintEvent(QPaintEvent* e) {
     QPalette pal = palette();
-    pal.setColor(QPalette::Background, runningColor);
-    colorSelected->setAutoFillBackground(true);
-    colorSelected->setPalette(pal);
+    pal.setColor(QPalette::Background, blobColor);
+    blobColorWidget->setAutoFillBackground(true);
+    blobColorWidget->setPalette(pal);
 
     QPalette pal2 = palette();
 
-    if(currentTessel){
-        QColor c = currentTessel->getColor();
-        pal2.setColor(QPalette::Background, c);
-        pickedColor->setAutoFillBackground(true);
-        pickedColor->setPalette(pal2);
-    }
+    QColor c = pickedColor;
+    pal2.setColor(QPalette::Background, pickedColor);
+    pickedColorWidget->setAutoFillBackground(true);
+    pickedColorWidget->setPalette(pal2);
 }
 
 void DishTools::blobColorChange(Blob *b) {
     QColor c = b->getColor();
-    setRunningColor(c);
+    blobColor = c;
+    update();
 }

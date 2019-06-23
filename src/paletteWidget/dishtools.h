@@ -6,7 +6,7 @@
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QSlider>
-#include "canvas.h"
+#include "dish.h"
 #include "blob.h"
 #include "tessel.h"
 
@@ -15,16 +15,16 @@ class DishTools : public QGroupBox
     Q_OBJECT
 
 public:
-    DishTools(Canvas * canv);
+    DishTools(Dish * canv);
     //QWidget * getColorSelected(){return colorSelected;};
 
 private:
-    Canvas * canvas = nullptr;
+    Dish * canvas = nullptr;
     QSlider * sizePicker = nullptr;
-    QColor runningColor = QColor(230, 230, 230);
-    QWidget * colorSelected = nullptr;
-    QWidget * pickedColor = nullptr;
-    Tessel * currentTessel = nullptr;
+    QColor blobColor = QColor(230, 230, 230);
+    QColor pickedColor = QColor(230, 230, 230);
+    QWidget * blobColorWidget = nullptr;
+    QWidget * pickedColorWidget = nullptr;
 
 public slots:
     void setBlobSize(int p);
@@ -33,14 +33,9 @@ public slots:
     void addBlob();
     void paintEvent(QPaintEvent*);
     void blobColorChange(Blob* b);
-    void setRunningColor(QColor c) {runningColor = c; update();}
-    void setCurrentTessel(Tessel * c) {
-        currentTessel = c;
-        emit tesselChanged(c->getColor());
+    void setPickedColor(QColor c) {
+        pickedColor = c;
         update();}
-
-signals:
-   void tesselChanged(QColor);
 
 };
 

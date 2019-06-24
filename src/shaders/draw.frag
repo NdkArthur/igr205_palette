@@ -9,6 +9,7 @@ uniform vec3 brush_color;
 uniform float brush_width;
 uniform sampler2D color_map;
 
+// Ce shader sert a rendre le trait du pinceau sur la texture
 
 
 void main() {

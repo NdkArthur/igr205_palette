@@ -43,7 +43,7 @@ void GLView::initializeGL()
     light_directions[1] = QVector3D(-0.4, -0.5, -0.5);
     light_colors[1] = QVector3D(0.8, 0.8, 1.);
 
-    light_directions[2] = QVector3D(0.4, -0.5, -0.5);
+    light_directions[2] = QVector3D(0.4, -0.5, +0.5);
     light_colors[2] = QVector3D(0.8, 1., 0.8);
 
     only_color_map = false;

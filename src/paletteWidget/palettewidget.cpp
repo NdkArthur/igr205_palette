@@ -8,7 +8,7 @@ PaletteWidget::PaletteWidget(QWidget *parent) :
     QWidget(parent)
 {
     std::vector<Blob*> blobs = std::vector<Blob*>();
-    Dish * canva = new Dish(this,300, 300, blobs);
+    Dish * canva = new Dish(this,400, 400, blobs);
 
     buttonZone = new DishTools(canva);
     //setCentralWidget(new Canvas(this));

@@ -3,6 +3,8 @@
 in vec2 vtx_2D_coord;
 out vec4 out_color;
 
+//Ce shader sert a l'affichage de la dish de la palette
+
 struct Blob {
     vec2 center;
     float radius;
@@ -33,7 +35,7 @@ void main() {
         sum += intensity;
         rgb += intensity * blobs[i].color;
     }
-    if (sum >0.7) {
+    if (sum >0.8) {
         out_color = vec4(rgb/sum, 1.);
     }
     else {

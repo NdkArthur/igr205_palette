@@ -15,7 +15,6 @@ Dish::Dish(QWidget * parent, int height, int width, std::vector<Blob*> b) : QOpe
 
     blobs = b;
     setMinimumSize(QSize(height, width));
-    setMaximumSize(QSize(height, width));
     std::vector<Blob*> blobs= std::vector<Blob*>();
     setMouseTracking(true);
 

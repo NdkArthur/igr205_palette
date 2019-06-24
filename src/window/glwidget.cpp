@@ -62,6 +62,8 @@ void GLWidget::initializeGL(){
     vao_ptr->create();
     doneCurrent();
 
+
+
 }
 
 void GLWidget::updateTexture(Model* model) {

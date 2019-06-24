@@ -21,7 +21,7 @@ public:
 private:
     Dish * canvas = nullptr;
     QSlider * sizePicker = nullptr;
-    QColor blobColor = QColor(230, 230, 230);
+    QColor blobColor = QColor(230, 30, 30);
     QColor pickedColor = QColor(230, 230, 230);
     QWidget * blobColorWidget = nullptr;
     QWidget * pickedColorWidget = nullptr;

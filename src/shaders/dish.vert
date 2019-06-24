@@ -1,5 +1,8 @@
 #version 450 core
 
+
+//Ce shader sert a l'affichage de la dish de la palette
+
 vec2 vertices[4] = { vec2(-1.0f, -1.0f), vec2(-1.0f, 1.0f),vec2(1.0f,-1.0f),vec2(1.0f, 1.0f)};
 
 out vec2 vtx_2D_coord;

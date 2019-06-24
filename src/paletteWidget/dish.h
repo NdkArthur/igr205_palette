@@ -25,7 +25,9 @@ class Dish : public QOpenGLWidget
 private :
 
     std::vector<Blob*> blobs= std::vector<Blob*>();
+    //seuil d'influence des blobs
     float treshold = 0.45;
+
     void pixelShader(QPoint p);
     bool loadProgram();
     QOpenGLShaderProgram program_;
@@ -35,13 +37,13 @@ private :
     int canvasWidth = 300;
     int canvasHeight = 300;
     bool moveIsOn = false;
+    // Le blob en deplacement
     Blob * selectedBlobMove = nullptr;
+    // La blob selectionne
     Blob * selectedBlobEdit = nullptr;
+
+    // vrai si le mode pipette est actif
     bool pickedModeIsOn = false;
-    QState * passiveState = nullptr;
-    QState * moveBlob = nullptr;
-    QState * editBlob = nullptr;
-    QStateMachine * mac = nullptr;
     QPoint currentPos = QPoint(0,0);
 
 public :
